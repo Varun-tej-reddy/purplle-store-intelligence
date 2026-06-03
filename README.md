@@ -199,17 +199,11 @@ docker compose up -d
 
 ### Services
 
-Backend:
+Live Demo:
+https://purplle-store-intelligence-one.vercel.app/
 
-```text
-http://localhost:8000
-```
-
-Frontend:
-
-```text
-http://localhost:5173
-```
+Repository:
+https://github.com/Varun-tej-reddy/purplle-store-intelligence
 
 ---
 
