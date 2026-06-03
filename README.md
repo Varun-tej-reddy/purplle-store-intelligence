@@ -206,7 +206,17 @@ Repository:
 https://github.com/Varun-tej-reddy/purplle-store-intelligence
 
 ---
+#Local Services
 
+Frontend : 
+```
+http://localhost:8000
+```
+Backend :
+```
+http://localhost:5173
+```
+---
 ## Processing Videos
 
 Example:
