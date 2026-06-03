@@ -1,91 +1,326 @@
-# Purplle Store Intelligence System
+# Purplle Store Intelligence
 
-Production-style AI analytics platform for converting CCTV footage into business KPIs.
+AI-powered retail analytics platform that transforms CCTV footage into actionable business insights.
+
+Built for the Purplle Tech Challenge 2026.
+
+---
+
+## Overview
+
+Retail stores generate massive amounts of CCTV footage, but extracting useful business insights manually is difficult and time-consuming.
+
+Purplle Store Intelligence uses Computer Vision, Multi-Object Tracking, and Event Analytics to convert raw surveillance video into structured retail intelligence.
+
+The system automatically detects customers, tracks their movement across store zones, measures dwell times, identifies queue behavior, and generates analytics dashboards for business decision-making.
+
+---
+
+## Features
+
+### Customer Footfall Analytics
+- Detects customer entries and exits
+- Counts visitors per camera
+- Tracks unique visitors
+
+### Zone Analytics
+- Zone entry detection
+- Zone exit detection
+- Zone dwell-time tracking
+- Customer movement analysis
+
+### Queue Monitoring
+- Billing queue join detection
+- Queue behavior analysis
+- Customer congestion monitoring
+
+### Event Pipeline
+- Real-time event generation
+- Structured JSON event stream
+- Event ingestion API
+- PostgreSQL event storage
+
+### Analytics Dashboard
+- Live event feed
+- Store health monitoring
+- Footfall metrics
+- Funnel analytics
+- Zone performance insights
+- Anomaly detection
+
+---
 
 ## Architecture
 
-Data flow:
+```text
+CCTV Videos
+      │
+      ▼
+YOLOv8 Person Detection
+      │
+      ▼
+ByteTrack Multi-Object Tracking
+      │
+      ▼
+Zone Assignment Engine
+      │
+      ▼
+Event Generation Pipeline
+      │
+      ▼
+FastAPI Backend
+      │
+      ▼
+PostgreSQL Database
+      │
+      ▼
+React Dashboard
+```
 
-`CCTV Video -> YOLOv8 Detection -> ByteTrack Tracking -> Zone Assignment -> Event Emission -> PostgreSQL -> FastAPI Analytics -> React Dashboard`
+---
 
-Core components:
+## Tech Stack
 
-- `pipeline/`: computer-vision event generation pipeline (YOLOv8 + tracker abstraction)
-- `app/`: FastAPI backend with ingestion, metrics, funnel, heatmap, anomalies, health
-- `frontend/`: React + Vite dashboard with Chart.js visualizations
-- `tests/`: Pytest suite for ingestion/metrics/funnel/anomalies
+### Backend
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+- Pydantic
 
-## Quick Start
+### Computer Vision
+- YOLOv8
+- OpenCV
+- ByteTrack
+- NumPy
 
-### Prerequisites
+### Frontend
+- React
+- Vite
+- JavaScript
+- CSS
 
+### DevOps
 - Docker
 - Docker Compose
 
-### Run
+### Testing
+- Pytest
 
-```bash
-docker compose up --build
+---
+
+## Project Structure
+
+```text
+purplle-store-intelligence/
+│
+├── app/
+│   ├── main.py
+│   ├── ingestion.py
+│   ├── metrics.py
+│   ├── funnel.py
+│   ├── anomalies.py
+│   └── health.py
+│
+├── pipeline/
+│   ├── detect.py
+│   ├── tracker.py
+│   ├── zones.py
+│   ├── emit.py
+│   └── process_video.py
+│
+├── frontend/
+│   ├── src/
+│   └── package.json
+│
+├── docs/
+│   ├── DESIGN.md
+│   └── CHOICES.md
+│
+├── tests/
+│
+├── docker-compose.yml
+├── Dockerfile
+└── requirements.txt
 ```
 
-Services:
+---
 
-- API: `http://localhost:8000`
-- API Docs: `http://localhost:8000/docs`
-- Frontend: `http://localhost:5173`
-- PostgreSQL: `localhost:5432`
+## Event Types
 
-## API Endpoints
+The system generates the following retail events:
 
-- `POST /events/ingest`
-- `GET /stores/{id}/metrics`
-- `GET /stores/{id}/funnel`
-- `GET /stores/{id}/heatmap`
-- `GET /stores/{id}/anomalies`
-- `GET /health`
+- ENTRY
+- EXIT
+- ZONE_ENTER
+- ZONE_EXIT
+- ZONE_DWELL
+- BILLING_QUEUE_JOIN
 
-## Example Ingestion Payload
+Example Event:
 
 ```json
 {
-  "events": [
-    {
-      "event_id": "evt_101",
-      "store_id": "store_1",
-      "camera_id": "cam_1",
-      "visitor_id": "visitor_42",
-      "event_type": "ENTRY",
-      "timestamp": "2026-01-01T10:00:00Z",
-      "zone_id": "ENTRY",
-      "dwell_ms": null,
-      "is_staff": false,
-      "confidence": 0.97,
-      "metadata": {}
-    }
-  ]
+  "event_id": "evt_001",
+  "store_id": "store_1",
+  "camera_id": "cam_1",
+  "visitor_id": "visitor_12",
+  "event_type": "ZONE_ENTER",
+  "timestamp": "2026-05-31T10:15:30Z"
 }
 ```
 
-## Running Tests
+---
+
+## Installation
+
+### Clone Repository
 
 ```bash
-pytest -q
+git clone https://github.com/Varun-tej-reddy/purplle-store-intelligence.git
+
+cd purplle-store-intelligence
 ```
 
-## CV Pipeline Usage
+---
+
+## Run With Docker
+
+### Build
 
 ```bash
-bash pipeline/run.sh data/videos/sample.mp4 data/output/events.jsonl
+docker compose build
 ```
 
-or
+### Start Services
 
 ```bash
-python -m pipeline.process_video --video data/videos/sample.mp4 --output data/output/events.jsonl
+docker compose up -d
 ```
 
-## Notes
+### Services
 
-- Ingestion deduplicates by `event_id`
-- Conversion is computed as unique purchasers / unique visitors
-- Active anomalies are recalculated on anomaly endpoint calls
+Backend:
+
+```text
+http://localhost:8000
+```
+
+Frontend:
+
+```text
+http://localhost:5173
+```
+
+---
+
+## Processing Videos
+
+Example:
+
+```bash
+python -m pipeline.process_video \
+--video "CAM 1.mp4" \
+--camera-id cam_1 \
+--output output/events_cam1.jsonl
+```
+
+Generated events can then be ingested into the backend.
+
+---
+
+## API Endpoints
+
+### Health
+
+```http
+GET /health
+```
+
+### Event Ingestion
+
+```http
+POST /events/ingest
+```
+
+### Metrics
+
+```http
+GET /metrics
+```
+
+### Funnel Analytics
+
+```http
+GET /funnel
+```
+
+### Anomalies
+
+```http
+GET /anomalies
+```
+
+---
+
+## Sample Results
+
+Example processed dataset:
+
+| Camera | Entries | Exits |
+|----------|----------|----------|
+| cam_1 | 12 | 12 |
+| cam_2 | 13 | 12 |
+| cam_5 | 2 | 2 |
+
+Total Events Processed:
+
+```text
+160+
+```
+
+---
+
+## Testing
+
+Run tests:
+
+```bash
+pytest
+```
+
+---
+
+## Design Decisions
+
+Key design decisions are documented in:
+
+```text
+docs/DESIGN.md
+docs/CHOICES.md
+```
+
+---
+
+## Future Improvements
+
+- Real-time RTSP camera support
+- Multi-camera identity association
+- Advanced queue analytics
+- Heatmap visualization
+- Customer journey prediction
+- Cloud deployment
+- Real-time alerting
+
+---
+
+## Team
+
+### Varun Tej Reddy
+
+Purplle Tech Challenge 2026 Submission
+
+---
+
+## License
+
+This project was developed as part of the Purplle Tech Challenge 2026 hackathon and is intended for educational and demonstration purposes.
